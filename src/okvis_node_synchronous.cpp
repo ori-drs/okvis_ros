@@ -183,7 +183,7 @@ int main(int argc, char **argv) {
 	  okvis_estimator.display();
 
     // @davidwisth
-    LOG(INFO) << "[INFO] Starting loop with image #" << counter;
+    LOG(INFO) << "[INFO] <><><><><><><><><><><><> Starting loop with image # " << counter << " <><><><><><><><><><><><>";
 
     // check if at the end
     if (view_imu_iterator == view_imu.end()){
@@ -209,6 +209,7 @@ int main(int argc, char **argv) {
 
     // add images
     okvis::Time t;
+    int num_imu_measurements=0; // @davidwisth
     for(size_t i=0; i<numCameras;++i) {
       sensor_msgs::ImageConstPtr msg1 = view_cam_iterators[i]
           ->instantiate<sensor_msgs::Image>();
@@ -237,6 +238,7 @@ int main(int argc, char **argv) {
           okvis_estimator.addImuMeasurement(t_imu, acc, gyr);
 
         view_imu_iterator++;
+        num_imu_measurements++; //@davidwisth
       } while (view_imu_iterator != view_imu.end() && t_imu <= t);
 
       // add the image to the frontend for (blocking) processing
@@ -245,10 +247,10 @@ int main(int argc, char **argv) {
 
       view_cam_iterators[i]++;
     }
+    //LOG(INFO) << "[INFO] " << num_imu_measurements << " IMU measurements loaded between frames."; //@davidwisth
     ++counter;
 
     // display progress
-    // @davidwisth: show progress for every frame.
     if (counter % 20 == 0) {
       std::cout
           << "\rProgress: "
@@ -256,7 +258,8 @@ int main(int argc, char **argv) {
           << "%  " ;
     }
 
-    LOG(INFO) << "[USER-INPUT] Press any key to load next frame.";
+    // @davidwisth: require the user to manually load next frame for debug purposes.
+    LOG(INFO) << "[USER-INPUT] Press Enter to load next frame.";
     std::getchar();
 
   }
