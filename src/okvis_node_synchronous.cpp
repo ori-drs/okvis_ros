@@ -4,7 +4,7 @@
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
- * 
+ *
  *   * Redistributions of source code must retain the above copyright notice,
  *     this list of conditions and the following disclaimer.
  *   * Redistributions in binary form must reproduce the above copyright notice,
@@ -34,7 +34,7 @@
 /**
  * @file okvis_node_synchronous.cpp
  * @brief This file includes the synchronous ROS node implementation.
- 
+
           This node goes through a rosbag in order and waits until all processing is done
           before adding a new message to algorithm
 
@@ -172,11 +172,18 @@ int main(int argc, char **argv) {
       view_cam_iterators[i]++;
   }
 
+  /////////////////////////////////////////////
+  // START OF THE LOOP
+  /////////////////////////////////////////////
+
   int counter = 0;
   okvis::Time start(0.0);
   while (ros::ok()) {
     ros::spinOnce();
-	okvis_estimator.display();
+	  okvis_estimator.display();
+
+    // @davidwisth
+    LOG(INFO) << "[INFO] Starting loop with image #" << counter;
 
     // check if at the end
     if (view_imu_iterator == view_imu.end()){
@@ -241,12 +248,16 @@ int main(int argc, char **argv) {
     ++counter;
 
     // display progress
+    // @davidwisth: show progress for every frame.
     if (counter % 20 == 0) {
       std::cout
           << "\rProgress: "
           << int(double(counter) / double(view_cams_ptr.back()->size()) * 100)
           << "%  " ;
     }
+
+    LOG(INFO) << "[USER-INPUT] Press any key to load next frame.";
+    std::getchar();
 
   }
 
